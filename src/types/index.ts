@@ -24,6 +24,21 @@ export interface Friendship {
   updatedAt: string;
 }
 
+export interface GroupMember {
+  id: string;
+  userId: string;
+  createdAt: string;
+  user: User;
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  creatorId: string;
+  createdAt: string;
+  members: GroupMember[];
+}
+
 /**
  * Defines a category for challenges, including metadata for UI representation and rewards.
  */
@@ -65,4 +80,4 @@ export interface LeaderboardEntry {
 // Navigation and UI state types
 export type Tab = "quests" | "guild" | "fame" | "profile";
 export type QuestTab = "inbox" | "active";
-export type GuildTab = "roster" | "invites";
+export type GuildTab = "roster" | "invites" | "groups";

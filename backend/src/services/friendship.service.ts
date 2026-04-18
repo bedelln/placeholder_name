@@ -13,6 +13,23 @@ const updateFriendshipStatusSchema = z.object({
   })
 });
 
+export async function getAcceptedFriendIds(userId: string) {
+  const friendships = await prisma.friendship.findMany({
+    where: {
+      status: "accepted",
+      OR: [{ requesterId: userId }, { addresseeId: userId }]
+    },
+    select: {
+      requesterId: true,
+      addresseeId: true
+    }
+  });
+
+  return friendships.map((friendship) =>
+    friendship.requesterId === userId ? friendship.addresseeId : friendship.requesterId
+  );
+}
+
 export async function sendFriendRequest(requesterId: string, input: unknown) {
   const data = sendFriendRequestSchema.parse(input);
 

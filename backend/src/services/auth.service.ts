@@ -13,7 +13,7 @@ const registerSchema = z.object({
     .max(30, "Username must be at most 30 characters long")
     .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
   email: z.string().trim().email("A valid email is required"),
-  password: z.string().min(8, "Password must be at least 8 characters long").max(72),
+  password: z.string().min(8, "Password needs to be at least 8 characters").max(72),
   displayName: z.string().trim().min(1, "Display name is required").max(50)
 });
 

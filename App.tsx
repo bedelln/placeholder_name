@@ -140,6 +140,7 @@ export default function App() {
           )}
           {tab === "guild" && (
             <GuildRosterView
+              currentUserId={currentUser.id}
               onToast={showToast}
               onFriendsChange={setFriends}
             />
@@ -148,7 +149,7 @@ export default function App() {
             <HallOfFameView currentUserId={currentUser.id} />
           )}
           {tab === "profile" && (
-            <ProfileView currentUser={currentUser} onXpGain={handleXpGain} />
+            <ProfileView currentUser={currentUser} />
           )}
         </div>
 

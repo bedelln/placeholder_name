@@ -91,6 +91,24 @@ function createSchema() {
       UNIQUE ("challengeId", "recipientId")
     );
 
+    CREATE TABLE IF NOT EXISTS "Group" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "name" TEXT NOT NULL,
+      "creatorId" TEXT NOT NULL,
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY ("creatorId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS "GroupMember" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "groupId" TEXT NOT NULL,
+      "userId" TEXT NOT NULL,
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY ("groupId") REFERENCES "Group"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      UNIQUE ("groupId", "userId")
+    );
+
     CREATE INDEX IF NOT EXISTS "Friendship_requesterId_idx" ON "Friendship"("requesterId");
     CREATE INDEX IF NOT EXISTS "Friendship_addresseeId_idx" ON "Friendship"("addresseeId");
     CREATE INDEX IF NOT EXISTS "Friendship_status_idx" ON "Friendship"("status");
@@ -98,6 +116,8 @@ function createSchema() {
     CREATE INDEX IF NOT EXISTS "Challenge_categoryId_idx" ON "Challenge"("categoryId");
     CREATE INDEX IF NOT EXISTS "ChallengeRecipient_recipientId_idx" ON "ChallengeRecipient"("recipientId");
     CREATE INDEX IF NOT EXISTS "ChallengeRecipient_status_idx" ON "ChallengeRecipient"("status");
+    CREATE INDEX IF NOT EXISTS "Group_creatorId_idx" ON "Group"("creatorId");
+    CREATE INDEX IF NOT EXISTS "GroupMember_userId_idx" ON "GroupMember"("userId");
   `);
 }
 

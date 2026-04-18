@@ -10,13 +10,13 @@ export function AuthView({ onAuthSuccess }: { onAuthSuccess: (user: User) => voi
   const [mode, setMode] = useState<"login" | "register">("login");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const [form, setForm] = useState({
+  const emptyForm = {
     username: "",
     email: "",
     password: "",
     displayName: "",
-  });
+  };
+  const [form, setForm] = useState(emptyForm);
 
   /**
    * Handles form submission for both login and registration.
@@ -41,6 +41,12 @@ export function AuthView({ onAuthSuccess }: { onAuthSuccess: (user: User) => voi
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleModeSwitch = () => {
+    setMode(mode === "login" ? "register" : "login");
+    setError(null);
+    setForm(emptyForm);
   };
 
   return (
@@ -115,7 +121,7 @@ export function AuthView({ onAuthSuccess }: { onAuthSuccess: (user: User) => voi
       <div style={{ fontSize: 14, color: "var(--muted)" }}>
         {mode === "login" ? "New to these lands?" : "Already a legend?"}{" "}
         <button
-          onClick={() => setMode(mode === "login" ? "register" : "login")}
+          onClick={handleModeSwitch}
           style={{ background: "transparent", color: "var(--teal)", fontWeight: 700 }}
         >
           {mode === "login" ? "Register" : "Login"}

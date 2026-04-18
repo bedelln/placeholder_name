@@ -22,6 +22,8 @@ model User {
   receivedFriendRequests Friendship[]         @relation("FriendshipAddressee")
   sentChallenges         Challenge[]          @relation("ChallengeSender")
   receivedChallenges     ChallengeRecipient[]
+  createdGroups          Group[]              @relation("GroupCreator")
+  groupMemberships       GroupMember[]
 }
 
 model Friendship {
@@ -83,4 +85,29 @@ model ChallengeRecipient {
   @@unique([challengeId, recipientId])
   @@index([recipientId])
   @@index([status])
+}
+
+model Group {
+  id        String        @id @default(cuid())
+  name      String
+  creatorId String
+  createdAt DateTime      @default(now())
+
+  creator User          @relation("GroupCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  members GroupMember[]
+
+  @@index([creatorId])
+}
+
+model GroupMember {
+  id        String   @id @default(cuid())
+  groupId    String
+  userId     String
+  createdAt  DateTime @default(now())
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
 }

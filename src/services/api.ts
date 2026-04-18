@@ -1,4 +1,4 @@
-import { User, Friendship, Challenge, ChallengeCategory, LeaderboardEntry } from "../types";
+import { User, Friendship, Challenge, ChallengeCategory, LeaderboardEntry, Group } from "../types";
 
 /**
  * Base URL for the API. In a real app, this would come from an environment variable.
@@ -112,7 +112,32 @@ export const api = {
    * Leaderboard (Hall of Fame) endpoints.
    */
   leaderboard: {
+    list: (groupId?: string) =>
+        apiFetch<{ leaderboard: LeaderboardEntry[] }>(`/leaderboard${groupId ? `?groupId=${encodeURIComponent(groupId)}` : ""}`).then(res => res.leaderboard),
+  },
+  groups: {
     list: () =>
-        apiFetch<{ leaderboard: LeaderboardEntry[] }>("/leaderboard").then(res => res.leaderboard),
+        apiFetch<{ groups: Group[] }>("/groups").then(res => res.groups),
+    get: (id: string) =>
+        apiFetch<{ group: Group }>(`/groups/${id}`).then(res => res.group),
+    create: (payload: { name: string; memberIds: string[] }) =>
+        apiFetch<{ group: Group }>("/groups", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        }).then(res => res.group),
+    addMembers: (id: string, memberIds: string[]) =>
+        apiFetch<{ group: Group }>(`/groups/${id}/members`, {
+          method: "POST",
+          body: JSON.stringify({ memberIds }),
+        }).then(res => res.group),
+    rename: (id: string, name: string) =>
+        apiFetch<{ group: Group }>(`/groups/${id}`, {
+          method: "PATCH",
+          body: JSON.stringify({ name }),
+        }).then(res => res.group),
+    removeMember: (id: string, memberUserId: string) =>
+        apiFetch<{ group: Group | null }>(`/groups/${id}/members/${memberUserId}`, {
+          method: "DELETE",
+        }).then(res => res.group),
   },
 };

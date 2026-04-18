@@ -3,14 +3,12 @@ import { User } from '../types';
 
 /**
  * The ProfileView displays the user's progress in a card-based layout inspired by
- * the original concept while keeping the live XP, training, and logout behavior.
+ * the original concept while keeping the live XP display and logout behavior.
  */
 export function ProfileView({
   currentUser,
-  onXpGain,
 }: {
   currentUser: User;
-  onXpGain: (xp: number, x: number, y: number) => void;
 }) {
   const [xp, setXp] = useState(currentUser.xp);
   const [displayXp, setDisplayXp] = useState(0);
@@ -63,17 +61,7 @@ export function ProfileView({
       title: "Account forged and ready for sidequests",
       subtitle: `Joined ${new Date(currentUser.createdAt).toLocaleDateString()}`,
     },
-    {
-      icon: "✨",
-      title: "Training grants 10 XP instantly",
-      subtitle: "Use it to test the live XP animation",
-    },
   ];
-
-  const handleManualXp = (e: React.MouseEvent) => {
-    onXpGain(10, e.clientX, e.clientY);
-    setXp((prev) => prev + 10);
-  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", overflowY: "auto" }}>
@@ -238,10 +226,6 @@ export function ProfileView({
               ))}
             </div>
           </div>
-
-          <button className="btn-gold" style={{ width: "100%" }} onClick={handleManualXp}>
-            ✨ Train (Gain 10 XP)
-          </button>
 
           <button
             className="btn-ghost"
