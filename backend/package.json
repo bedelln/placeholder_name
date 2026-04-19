@@ -11,6 +11,7 @@
     "prisma:generate": "prisma generate",
     "db:setup": "node scripts/setup-sqlite.mjs",
     "prisma:seed": "node scripts/setup-sqlite.mjs --seed-only",
+    "prisma:seed-mocks": "tsx prisma/seed_mocks.ts",
     "setup:dev": "npm run prisma:generate && npm run db:setup"
   },
   "prisma": {
