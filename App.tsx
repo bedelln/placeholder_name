@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { User, Tab } from "./src/types";
-import { api } from "./src/services/api";
-import { GlobalStyles } from "./src/styles/GlobalStyles";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { BottomNav } from "./src/components/BottomNav";
 import { Spinner } from "./src/components/Common";
 import { Toast, XpFloat } from "./src/components/Feedback";
-import { BottomNav } from "./src/components/BottomNav";
+import { api } from "./src/services/api";
+import { GlobalStyles } from "./src/styles/GlobalStyles";
+import { Tab, User } from "./src/types";
+import { AdminView } from "./src/views/AdminView";
 import { AuthView } from "./src/views/AuthView";
-import { QuestBoardView } from "./src/views/QuestBoardView";
 import { GuildRosterView } from "./src/views/GuildRosterView";
 import { HallOfFameView } from "./src/views/HallOfFameView";
 import { ProfileView } from "./src/views/ProfileView";
+import { QuestBoardView } from "./src/views/QuestBoardView";
 
 /**
  * Main application entry point for Sidequesting.
@@ -27,9 +28,16 @@ export default function App() {
   const [inboxCount, setInboxCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
 
+  // Set default tab based on user role
+  useEffect(() => {
+    if (currentUser) {
+      setTab(currentUser.role === "admin" ? "admin" : "quests");
+    }
+  }, [currentUser]);
+
   // Poll for notifications (new quests and friend requests) every 15 seconds.
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser || currentUser.role === "admin") return;
     const fetchCounts = async () => {
       try {
         const [inbox, pending] = await Promise.all([
@@ -46,7 +54,7 @@ export default function App() {
   }, [currentUser]);
 
   useEffect(() => {
-    if (!currentUser) {
+    if (!currentUser || currentUser.role === "admin") {
       setFriends([]);
       return;
     }
@@ -148,6 +156,9 @@ export default function App() {
           {tab === "fame" && (
             <HallOfFameView currentUserId={currentUser.id} />
           )}
+          {tab === "admin" && currentUser.role === "admin" && (
+            <AdminView />
+          )}
           {tab === "profile" && (
             <ProfileView currentUser={currentUser} />
           )}
@@ -158,6 +169,7 @@ export default function App() {
           setTab={setTab}
           inboxCount={inboxCount}
           pendingCount={pendingCount}
+          isAdmin={currentUser.role === "admin"}
         />
       </div>
 

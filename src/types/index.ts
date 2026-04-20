@@ -7,6 +7,7 @@ export interface User {
   displayName: string;
   avatarUrl: string;
   xp: number;
+  role: string;
   createdAt: string;
 }
 
@@ -78,6 +79,6 @@ export interface LeaderboardEntry {
 }
 
 // Navigation and UI state types
-export type Tab = "quests" | "guild" | "fame" | "profile";
+export type Tab = "quests" | "guild" | "fame" | "profile" | "admin";
 export type QuestTab = "inbox" | "active";
 export type GuildTab = "roster" | "invites" | "groups";

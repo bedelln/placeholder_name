@@ -27,14 +27,14 @@ async function main() {
 
   // 2. Users
   const passwordHash = await bcrypt.hash("password123", 10);
-  
+
   const users = [
-    { id: "u-000", username: "heroprotagonist", displayName: "Hero Protagonist", email: "hero@example.com", avatarUrl: "", xp: 1250, passwordHash },
-    { id: "u-1", username: "theron", displayName: "Theron Gale", email: "theron@example.com", avatarUrl: "", xp: 2380, passwordHash },
-    { id: "u-2", username: "lyra",   displayName: "Lyra Emberveil", email: "lyra@example.com", avatarUrl: "", xp: 1990, passwordHash },
-    { id: "u-3", username: "daxon",  displayName: "Daxon Crest", email: "daxon@example.com", avatarUrl: "", xp: 1740, passwordHash },
-    { id: "u-4", username: "selva",  displayName: "Selva Nightrun", email: "selva@example.com", avatarUrl: "", xp: 980, passwordHash },
-    { id: "u-5", username: "zephyra", displayName: "Zephyra Dusk", email: "zephyra@example.com", avatarUrl: "", xp: 550, passwordHash },
+    { id: "u-000", username: "heroprotagonist", displayName: "Hero Protagonist", email: "hero@example.com", avatarUrl: "", xp: 1250, role: "user", passwordHash },
+    { id: "u-1", username: "theron", displayName: "Theron Gale", email: "theron@example.com", avatarUrl: "", xp: 2380, role: "user", passwordHash },
+    { id: "u-2", username: "lyra",   displayName: "Lyra Emberveil", email: "lyra@example.com", avatarUrl: "", xp: 1990, role: "user", passwordHash },
+    { id: "u-3", username: "daxon",  displayName: "Daxon Crest", email: "daxon@example.com", avatarUrl: "", xp: 1740, role: "user", passwordHash },
+    { id: "u-4", username: "selva",  displayName: "Selva Nightrun", email: "selva@example.com", avatarUrl: "", xp: 980, role: "user", passwordHash },
+    { id: "u-5", username: "zephyra", displayName: "Zephyra Dusk", email: "zephyra@example.com", avatarUrl: "", xp: 550, role: "user", passwordHash },
   ];
 
   for (const user of users) {
@@ -73,11 +73,9 @@ async function main() {
       title: "Dawn Warrior",
       description: "Complete a 30-minute workout before sunrise. Screenshot your fitness app as proof.",
       xpReward: 150,
-      createdAt: new Date(Date.now() - 3600000),
-      expiresAt: new Date(Date.now() + 2 * 86400000),
+      expiresAt: undefined,
       recipients: {
         create: {
-          id: "rr-1",
           recipientId: "u-000",
           status: "pending",
         }
@@ -90,10 +88,9 @@ async function main() {
       title: "Lorekeeper",
       description: "Read for 45 consecutive minutes without touching your phone. Honor system — do you dare?",
       xpReward: 80,
-      createdAt: new Date(Date.now() - 7200000),
+      expiresAt: undefined,
       recipients: {
         create: {
-          id: "rr-2",
           recipientId: "u-000",
           status: "pending",
         }
@@ -106,11 +103,9 @@ async function main() {
       title: "The Cold Plunge",
       description: "Take a full cold shower for at least 2 minutes. Emerge victorious.",
       xpReward: 200,
-      createdAt: new Date(Date.now() - 86400000),
-      expiresAt: new Date(Date.now() + 86400000),
+      expiresAt: undefined,
       recipients: {
         create: {
-          id: "rr-3",
           recipientId: "u-000",
           status: "accepted",
         }
@@ -119,16 +114,17 @@ async function main() {
   ];
 
   for (const ch of challenges) {
-    // Delete existing recipients for this challenge to avoid conflicts during upsert-like behavior
+    // Delete existing recipients for this challenge to avoid conflicts
     await prisma.challengeRecipient.deleteMany({ where: { challengeId: ch.id } });
-    
+
+    // Separate recipients from challenge data
+    const { recipients, ...challengeData } = ch;
+
+    // Upsert the challenge with nested recipients
     await prisma.challenge.upsert({
       where: { id: ch.id },
-      update: {
-        ...ch,
-        recipients: undefined // Handled by create/deleteMany
-      },
-      create: ch,
+      update: challengeData,
+      create: { ...challengeData, recipients },
     });
   }
   console.log("Challenges seeded.");

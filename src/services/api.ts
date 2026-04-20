@@ -142,4 +142,31 @@ export const api = {
           method: "DELETE",
         }).then(res => res.group),
   },
+  /**
+   * Admin endpoints for managing users and challenges.
+   */
+  admin: {
+    listUsers: (limit?: number, offset?: number, search?: string) => {
+      const params = new URLSearchParams();
+      if (limit) params.append("limit", limit.toString());
+      if (offset) params.append("offset", offset.toString());
+      if (search) params.append("search", search);
+      return apiFetch<{ users: User[]; total: number }>(`/admin/users${params.toString() ? `?${params}` : ""}`);
+    },
+    getUserDetail: (userId: string) =>
+        apiFetch<{ user: User; sentChallenges: Challenge[]; receivedChallenges: any[] }>(`/admin/users/${userId}`),
+    updateUserXp: (userId: string, xp: number) =>
+        apiFetch<{ user: User }>(`/admin/users/${userId}`, {
+          method: "PATCH",
+          body: JSON.stringify({ xp }),
+        }).then(res => res.user),
+    deleteUser: (userId: string) =>
+        apiFetch<{ message: string }>(`/admin/users/${userId}`, {
+          method: "DELETE",
+        }),
+    deleteChallenge: (challengeId: string) =>
+        apiFetch<{ message: string }>(`/admin/challenges/${challengeId}`, {
+          method: "DELETE",
+        }),
+  },
 };

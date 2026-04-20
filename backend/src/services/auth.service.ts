@@ -14,7 +14,9 @@ const registerSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
   email: z.string().trim().email("A valid email is required"),
   password: z.string().min(8, "Password needs to be at least 8 characters").max(72),
-  displayName: z.string().trim().min(1, "Display name is required").max(50)
+  displayName: z.string().trim().min(1, "Display name is required").max(50),
+  registrationType: z.enum(["user", "admin"]).optional().default("user"),
+  adminAccessCode: z.string().optional()
 });
 
 const loginSchema = z.object({
@@ -29,6 +31,7 @@ type SafeUser = {
   displayName: string;
   avatarUrl: string;
   xp: number;
+  role: string;
   createdAt: Date;
 };
 
@@ -40,6 +43,7 @@ function toSafeUser(user: SafeUser): SafeUser {
     displayName: user.displayName,
     avatarUrl: user.avatarUrl,
     xp: user.xp,
+    role: user.role,
     createdAt: user.createdAt
   };
 }
@@ -47,6 +51,16 @@ function toSafeUser(user: SafeUser): SafeUser {
 export async function registerUser(input: unknown) {
   const data = registerSchema.parse(input);
   const email = data.email.toLowerCase();
+
+  // If registering as admin, validate the access code
+  let role = "user";
+  if (data.registrationType === "admin") {
+    const adminCode = process.env.ADMIN_ACCESS_CODE;
+    if (!adminCode || data.adminAccessCode !== adminCode) {
+      throw new ApiError(403, "Invalid admin access code");
+    }
+    role = "admin";
+  }
 
   const existingUser = await prisma.user.findFirst({
     where: {
@@ -69,7 +83,8 @@ export async function registerUser(input: unknown) {
       username: data.username,
       email,
       passwordHash,
-      displayName: data.displayName
+      displayName: data.displayName,
+      role
     }
   });
 

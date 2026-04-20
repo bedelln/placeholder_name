@@ -6,18 +6,25 @@ export function BottomNav({
   setTab,
   inboxCount,
   pendingCount,
+  isAdmin,
 }: {
   tab: Tab;
   setTab: (t: Tab) => void;
   inboxCount: number;
   pendingCount: number;
+  isAdmin?: boolean;
 }) {
-  const items: { id: Tab; label: string; icon: string; count?: number }[] = [
-    { id: "quests", label: "Quests", icon: "⚔️", count: inboxCount },
-    { id: "guild", label: "Guild", icon: "🛡️", count: pendingCount },
-    { id: "fame", label: "Fame", icon: "🏆" },
-    { id: "profile", label: "Profile", icon: "👤" },
-  ];
+  const items: { id: Tab; label: string; icon: string; count?: number }[] = isAdmin
+    ? [
+        { id: "admin" as Tab, label: "Users", icon: "👥" },
+        { id: "profile", label: "Profile", icon: "👤" },
+      ]
+    : [
+        { id: "quests", label: "Quests", icon: "⚔️", count: inboxCount },
+        { id: "guild", label: "Guild", icon: "🛡️", count: pendingCount },
+        { id: "fame", label: "Fame", icon: "🏆" },
+        { id: "profile", label: "Profile", icon: "👤" },
+      ];
 
   return (
     <nav style={{
