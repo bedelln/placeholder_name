@@ -10,6 +10,7 @@ export async function getCurrentUser(userId: string) {
       displayName: true,
       avatarUrl: true,
       xp: true,
+      role: true,
       createdAt: true
     }
   });
